@@ -4,9 +4,9 @@
 #include "uthash.h"
 #include"vector.h"
 typedef struct {
-    int key;           // key map
+    int key;           // key
     Vector value;      // vector giá trị
-    UT_hash_handle hh; // hash handle cho uthash
+    UT_hash_handle hh; // giúp uthash quản lý phần tử trong bảng băm
 } MapEntry;
 
 extern MapEntry* map;

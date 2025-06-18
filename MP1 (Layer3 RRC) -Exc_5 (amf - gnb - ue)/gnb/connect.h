@@ -9,8 +9,8 @@
 #include <ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 
-SOCKET tcp_sock, udp_sock, amf_sock;
-struct sockaddr_in gnb_addr_tcp, gnb_addr_udp, ue_addr, amf_addr;
+SOCKET tcp_sock, udp_sock, udp_sock_rrc, amf_sock;
+struct sockaddr_in gnb_addr_tcp, gnb_addr_udp, gnb_addr_udp_rrc, ue_addr, ue_addr_rrc, amf_addr;
 
 
 void increase_sfn(SystemParameter* sp);

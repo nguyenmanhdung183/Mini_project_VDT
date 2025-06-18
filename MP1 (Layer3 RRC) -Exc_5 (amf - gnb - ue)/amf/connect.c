@@ -37,7 +37,8 @@ bool send_ngap(SOCKET sock, const  NgAP* ngap) {
 		printf("sent ngap failed\n");
 		return false;
 	}
-	printf("sent ngap\n");
+	//printf("sent ngap \n");
+	printf("send ngap ueid = % d\n", ngap->ue_id);
 	return true;
 }
 /// </funcion>

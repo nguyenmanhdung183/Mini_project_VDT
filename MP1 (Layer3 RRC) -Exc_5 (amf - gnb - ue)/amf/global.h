@@ -1,10 +1,9 @@
 ﻿#ifndef GLOBAL_H
 #define GLOBAL_H
 #include<stdint.h>
-
-#define SCALE 10
+#define SCALE 1
 #define TCP_PORT 6000
-#define numberOfNgapPerSecond 500
+#define numberOfNgapPerSecond 100000
 
 
 typedef struct {

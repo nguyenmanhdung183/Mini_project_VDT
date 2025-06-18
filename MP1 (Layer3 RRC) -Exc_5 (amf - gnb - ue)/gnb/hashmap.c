@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-MapEntry* map = NULL;  // map trống
+MapEntry* map = NULL;  // map trống là bảng băm
 CRITICAL_SECTION map_cs;
 
 void map_insert(int key, RRC value) {
     EnterCriticalSection(&map_cs);
 
-    MapEntry* e;
+	MapEntry* e; // con trỏ đến MapEntry muốn thêm
     HASH_FIND_INT(map, &key, e);
     if (e == NULL) {
         e = malloc(sizeof(MapEntry));
@@ -20,7 +20,7 @@ void map_insert(int key, RRC value) {
         }
         e->key = key;
         vector_init(&e->value); // Khởi tạo vector
-        HASH_ADD_INT(map, key, e);
+		HASH_ADD_INT(map, key, e); // Thêm entry vào map
        // printf("New MapEntry created: key=%d, vector=%p\n", key, &e->value);
     }
     vector_push_back(&e->value, value); // Thêm vào vector

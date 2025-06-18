@@ -3,7 +3,7 @@
 
 #include"global.h"
 #include"connect.h"
-
+#include<time.h>
 /*
 giao tiếp với gnb bằng tcp port 6000
 gửi bản tin NgAP paging
@@ -16,7 +16,7 @@ gửi bản tin NgAP paging
 
 int main() {
 	printf("amf\n");
-	NgAP ngap = { 100,123,100,101 };// bản tin báo có gọi video
+	NgAP ngap = { 100,300,100,101 };// bản tin báo có gọi video
 	tcp_init();
 
 	// gửi 400-500 bản tin ngap 1 s
@@ -44,22 +44,37 @@ int main() {
 	Sleep(200000);
 	send_ngap(tcp_sock, &ngap);
 #endif
-	int i = 0;
 	//int ue_id; //int r = min + rand() % (max - min + 1);
 	NgAP ngap_test;
 	ngap_test.cn_domain = 100;
 	ngap_test.tac = 100;
 	ngap_test.msg_type = 100;
-	while (1) {
-		for (i = 0; i < numberOfNgapPerSecond; i++) {
-			// create random ue_id :)))))
-			ngap_test.ue_id = 1 + rand() % (999);
-			if (i == 1 || i==100) send_ngap(tcp_sock, &ngap);
-			else send_ngap(tcp_sock, &ngap_test);
-			Sleep(1000);
 
+	DWORD64 start = GetTickCount64(); // Thời gian bắt đầu (ms)
+	int i = 0;
+	while (1) {
+			// create random ue_id :)))))
+			ngap_test.ue_id = 1 + rand() % (120);
+			if (i==0) send_ngap(tcp_sock, &ngap);
+			else send_ngap(tcp_sock, &ngap_test);
+			//Sleep(1);
+			i = (i + 1) % 40000;
 		}
-	}
+		NgAP ngap_test_n1;
+		ngap_test_n1.cn_domain = 0;
+		ngap_test_n1.tac = 0;
+		ngap_test_n1.msg_type = 0;
+		ngap_test_n1.ue_id = 0;
+		send_ngap(tcp_sock, &ngap_test_n1);
+	
+	DWORD64 end = GetTickCount64(); // Thời gian kết thúc (ms)	long seconds = end.tv_sec - start.tv_sec;
+	DWORD64 elapsed_ms = end - start;
+
+	printf("Runtime: %llu ms\n", elapsed_ms);
+	if (elapsed_ms > 0)
+		printf("Speed: %.2f NgAP/s\n", (numberOfNgapPerSecond * 1000.0) / elapsed_ms);
+	else
+		printf("Thời gian quá ngắn để tính toán\n");
 	printf("\nend\n");
 	system("pause");
 	closesocket(tcp_sock);

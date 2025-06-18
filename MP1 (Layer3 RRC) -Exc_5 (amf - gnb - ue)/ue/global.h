@@ -3,12 +3,21 @@
 
 #include<stdint.h>
 
-#define SCALE 10 // scale thời gian lên để dễ log terminal
+#define SCALE 1 // scale thời gian lên để dễ log terminal
 #define DRX 128 // tại sfn 0 128 256,512 thức để nhận paging
-#define UE_ID 123
-#define Ns 1 //số PO trong PF
+#define UE_ID 300
+#define Ns 2 //số PO trong PF
+
+#define N0 (DRX / Ns)
+#define PF ((DRX / N0) * (UE_ID % N0)) // 123
+
+#define is  (UE_ID / N0) % Ns
+#define PO  table[Ns][is] //9 
 
 #define UDP_PORT 5500
+#define UDP_PORT_RRC 5501
+
+#define INTERVAL_MS 1 // mô phỏng slot 1ms
 
 #define my_id 123
 #define my_tac 100
@@ -32,9 +41,18 @@ typedef struct {
     uint16_t sfn;
 } SystemParameter;
 
+typedef struct {
+    uint64_t time_ms;
+    uint16_t sfn;
+    uint8_t sf; // mô phỏng 1ms slot trong mỗi SFN
+} SystemClock;
+
 typedef enum {
     SYNC,
     ASYNC
 }State;
+
+
+
 
 #endif

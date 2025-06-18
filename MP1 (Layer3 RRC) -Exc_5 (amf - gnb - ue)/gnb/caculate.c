@@ -32,6 +32,7 @@ uint16_t caculate_pf_mod_t(uint32_t ue_id) {
 }
 
 
+
 // ==== CALC PF & PO ==== khi có ngap thì đẩy vào đây để cho ra paging task rồi đẩy vào queue 
 //PagingTask calc_task(NgAP ngap) {
 //    PagingTask task;
@@ -96,7 +97,7 @@ unsigned __stdcall listening_amf(void* arg) {
     while (1) {
         if (receive_ngap(amf_sock, &ngap)) {
             enqueue(ngap);
-            printf("------------------received NgAP\n");
+           // printf("------------------received NgAP\n");
         }
     }
 }
@@ -105,33 +106,30 @@ unsigned __stdcall listening_amf(void* arg) {
 unsigned __stdcall worker(void* arg) {
 
     while (1) {
+        RRC rrc;
         EnterCriticalSection(&sfn_lock);
         uint16_t sfn = clk.sfn;
         uint8_t sf = clk.sf;
         LeaveCriticalSection(&sfn_lock);
 
-		uint32_t key = sfn * 1024 + sf; // key = PF * 1024 + PO
+		uint32_t key = sfn * 10 + sf; // key = PF * 1024 + PO
 		Vector* vec = map_get(key);
         if (vec != NULL) { // nếu có key
             for (size_t i = 0; i < vec->size; i++) {
-                RRC rrc;
+		// chuẩn là phải broadcast cho tất cả các UE trong vec, nhưng ở đây chỉ gửi cho UE có ID = 123 để test
                 memcpy(&rrc, &vec->items[i], sizeof(RRC));
-                if (rrc.ue_id == 123) { // chỉ gửi cho UE có ID = 123
-                    send_rrc(udp_sock, &rrc, &ue_addr);
-                    printf("sent rrc to UE------------------\n");
+                if (rrc.ue_id == UE_ID) { // chỉ gửi cho UE có ID = 123
+                    send_rrc(udp_sock_rrc, &rrc, &ue_addr_rrc);
+                   // printf("sent rrc to UE------------------\n");
                 }
                 InterlockedIncrement(&rrc_sent);
             }
 			// xoá cái entry trong hash map sau khi đã gửi hết
 			map_remove(key);
 		}
-
-
 	}//end while
 
 }
-
-
 
 unsigned __stdcall log_thread(void* arg) {//hàm nay chưa chuẩn lắm, chỉ để test thôi
     while (1) {
@@ -161,12 +159,11 @@ unsigned __stdcall scheduler(void* arg) {
 			memcpy(&rrc, &ngap, sizeof(NgAP));
 			//printf("schedule NgAP: UE ID = %d, SFN = %d, SF = %d\n", rrc.ue_id, sfn, sf);
 			rrc_param = calculate_rrc_parameter(ngap, sfn, sf);
-			map_insert(rrc_param.PF * 1024 + rrc_param.PO, rrc);
+			map_insert(rrc_param.PF * 10 + rrc_param.PO, rrc);
 
-			printf("map insert : PF = %d, PO = %d, UE ID = %d\n", rrc_param.PF, rrc_param.PO, rrc.ue_id);
+			//printf("map insert : PF = %d, PO = %d, UE ID = %d\n", rrc_param.PF, rrc_param.PO, rrc.ue_id);
 
         }
-
     }
     return 0;
 }
@@ -200,4 +197,24 @@ RrcParmeter calculate_rrc_parameter(NgAP ngap,uint16_t sfn, uint8_t sf ) {
 		rrc_param.PF = ((uint8_t)floor(sfn / DRX) + 1) * DRX + PF; // lên lịch ở PF sau
     }
     return rrc_param;
+}
+
+
+unsigned __stdcall broadcast_mib_thread(void* arg) {
+	// cứ 80ms broadcast mib cho tất cả các UE chứa sfn hiện tại
+    MIB mib;
+    mib.message_id = 1;
+    uint16_t sfn;
+     uint8_t sf;
+    while (1) {
+        EnterCriticalSection(&sfn_lock);
+        sfn = clk.sfn;
+        sf = clk.sf;
+        LeaveCriticalSection(&sfn_lock);
+        // mới chỉ gửi cho 1 ue thôi
+        if (sfn % 8 == 0 && sf == 0) {
+            mib.sfn_value = sfn;
+            send_mib(udp_sock, &mib, &ue_addr);
+        }
+    }
 }
