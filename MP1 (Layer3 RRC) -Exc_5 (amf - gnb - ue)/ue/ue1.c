@@ -22,8 +22,8 @@ int main() {
     nếu ko có bản tin paging từ GNB thì UE ngủ lại sau khi kiểm tra
     */
     _beginthreadex(NULL, 0, clock_thread, NULL, 0, NULL);// đếm thời gian
-    _beginthreadex(NULL, 0, receive_mib_thread, NULL, 0, NULL);// đếm thời gian
-    _beginthreadex(NULL, 0, receive_rrc_thread, NULL, 0, NULL);// đếm thời gian
+    _beginthreadex(NULL, 0, receive_mib_thread, NULL, 0, NULL);// 
+    _beginthreadex(NULL, 0, receive_rrc_thread, NULL, 0, NULL);// 
 
     while(1){}
 
