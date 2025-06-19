@@ -32,7 +32,7 @@ void map_insert(int key, RRC value) {
 
 // Hàm xóa một entry khỏi map dựa trên key
 void map_remove(int key) {
-    EnterCriticalSection(&map_cs); // Bảo vệ truy cập đa luồng
+    EnterCriticalSection(&map_cs); 
 
     MapEntry* entry;
     HASH_FIND_INT(map, &key, entry); // Tìm entry với key tương ứng
@@ -69,7 +69,7 @@ Vector* map_get(int key) { // Lấy giá trị tương ứng với khóa key t�
 
 // Hàm in tất cả giá trị trong map
 void map_print() {
-    EnterCriticalSection(&map_cs); // Bảo vệ truy cập đa luồng
+    EnterCriticalSection(&map_cs); 
 
     MapEntry* entry, * tmp;
     HASH_ITER(hh, map, entry, tmp) { // Duyệt qua từng MapEntry trong map
