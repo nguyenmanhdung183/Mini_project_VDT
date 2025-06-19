@@ -13,10 +13,6 @@
 SOCKET ue_socket, ue_socket_rrc;
 struct sockaddr_in gnb_addr, gnb_addr_rrc;
 
-
-
-
-
 /// <fucion>
 bool check_correct_rrc_time(uint16_t sfn, uint8_t sf);
 void udp_init();// udp cho mib
@@ -32,7 +28,5 @@ unsigned __stdcall receive_mib_thread(void* arg);
 unsigned __stdcall receive_rrc_thread(void* arg);
 unsigned __stdcall clock_thread(void* arg);
 
-
-// luông chính để nhận MIB, luồng phụ để nhận RRC
 
 #endif
