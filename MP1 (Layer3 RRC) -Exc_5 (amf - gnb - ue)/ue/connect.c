@@ -20,9 +20,6 @@ int8_t table[5][4] = { // ánh xạ is và ns sang số sf
 };
 
 
-
-
-
 void increase_sfn(SystemParameter* sp) {
     sp->sfn = (sp->sfn + 1) % 1024;
 }
@@ -221,7 +218,6 @@ unsigned __stdcall receive_rrc_thread(void* arg) {
     }
 }
 
-
 // ==== CLOCK ==== đếm thời gian
 unsigned __stdcall clock_thread(void* arg) {
     LARGE_INTEGER freq, now, last;
@@ -235,7 +231,7 @@ unsigned __stdcall clock_thread(void* arg) {
         if (elapsed >= INTERVAL_MS) {
             EnterCriticalSection(&sfn_lock);
             clk.time_ms += INTERVAL_MS;
-            clk.sf = (clk.sf + 1) % 10; // 10 sfs per SFN (1ms each)
+            clk.sf = (clk.sf + 1) % 10; // 
             if (clk.sf == 0) {
                 clk.sfn = (clk.sfn + 1) % 1024;
 				InterlockedExchange(&increased_at_update_param, 1); // đánh dấu đã tăng sfn
@@ -253,11 +249,9 @@ unsigned __stdcall clock_thread(void* arg) {
                         clk.sfn = (clk.sfn + 1) % 1024;
                     }
                     LeaveCriticalSection(&sfn_lock);
-
                 }
             }
             InterlockedExchange(&increased_at_update_param, 0);
-
         }
     }
     return 0;
@@ -266,7 +260,5 @@ unsigned __stdcall clock_thread(void* arg) {
 
 bool check_correct_rrc_time(uint16_t sfn, uint8_t sf) {
     // nếu mà sfn và sf thoả mãn mấy cái phương trình tính po. pf của UE thì return true;
-    int a = PO;
-	int b = PF;
     return (sfn % DRX == PF && sf == PO);
 }
